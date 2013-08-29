@@ -5,7 +5,7 @@
 import os
 import sys
 import random
-from shell import shell
+import subprocess
 from time import time
 from itertools import cycle
 from ConfigParser import ConfigParser, NoOptionError
@@ -87,8 +87,11 @@ class WPLog(object):
         logfile.close()
 
     def fetch_last(self, n):
-        last_n = shell("tail -{0} {1}".format(str(n), self.conf.log_file))
-        return last_n.output()
+        last_n = subprocess.Popen(
+            ['tail', '-'+str(n), self.conf.log_file], 
+            stdout=subprocess.PIPE).communicate()[0]
+        last_n = filter(lambda x: len(x) > 0, last_n.split('\n'))
+        return last_n
     def in_last(self, n, candidate):
         last_n = self.fetch_last(n)
         for line in last_n:
