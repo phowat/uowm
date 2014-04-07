@@ -8,6 +8,9 @@ import subprocess
 from time import time
 from itertools import cycle
 from ConfigParser import ConfigParser, NoOptionError
+import magic
+import mimetypes
+
 
 class WPConfiguration(object):
     def __init__(self, confpath=None):
@@ -89,6 +92,7 @@ class WPLog(object):
         return False
 
 class WPCollection(object):
+    
     def __init__(self, directories):
         self.log = WPLog()
         self.conf = WPConfiguration()
@@ -105,9 +109,20 @@ class WPCollection(object):
             directories = self._cycle_dirs(directories)
 
         for directory in directories:
-            for root, subFolders, files in os.walk(directory):
+            for root, subFolders, files in os.walk(directory, followlinks=True):
                 for f in files:
-                    self.file_list.append(os.path.join(root, f))
+                    fullpath = os.path.join(root, f)
+                    (mime, enc) = mimetypes.guess_type(fullpath)
+                    if mime is None:
+                        try:
+                            mime = magic.from_file(fullpath, mime=True).split("/")[0]
+                        except UnicodeDecodeError:
+                            print "Unable to determine mime type for"+fullpath
+                            continue
+
+                    filetype = mime.split("/")[0]
+                    if filetype == 'image':
+                        self.file_list.append(fullpath)
 
         if len(self.file_list) < 1:
             raise RuntimeError("No wallpapers available in ."+str(directories))
