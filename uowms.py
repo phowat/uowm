@@ -3,13 +3,21 @@
 
 import tornado.ioloop
 import tornado.web
+from uowmlib import change_wallpaper
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         self.write("Hello, world")
 
+class ChangeWPHandler(tornado.web.RequestHandler):
+    def get(self):
+        response = {'response': 0}
+        change_wallpaper()
+        self.write(response)
+
 application = tornado.web.Application([
     (r"/", MainHandler),
+    (r"/change_wallpaper", ChangeWPHandler),
 ])
 
 def main():

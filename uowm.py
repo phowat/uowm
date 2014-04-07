@@ -3,8 +3,7 @@
 # Unnecessarily Overengineered Wallpaper Manager
 
 import sys
-from uowmlib import WPConfiguration, WPLog, WPCollection
-from uowmbackends import WPBackendGsettings
+from uowmlib import change_wallpaper
 import argparse
 
 options = {}
@@ -28,11 +27,5 @@ if __name__ == '__main__':
     if options.server is True:
         from uowms import main
         main()
-         
     else:
-        conf = WPConfiguration()
-        backend = WPBackendGsettings()
-        collection = WPCollection(options.directories)
-        winner = collection.draw()
-        backend.set_wallpaper(winner)
-
+        change_wallpaper(options.directories)

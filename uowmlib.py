@@ -10,6 +10,7 @@ from itertools import cycle
 from ConfigParser import ConfigParser, NoOptionError
 import magic
 import mimetypes
+from uowmbackends import WPBackendGsettings
 
 
 class WPConfiguration(object):
@@ -157,3 +158,9 @@ class WPCollection(object):
         return chosen
 
 
+def change_wallpaper(directories=[]):
+    conf = WPConfiguration()
+    backend = WPBackendGsettings()
+    collection = WPCollection(directories)
+    winner = collection.draw()
+    backend.set_wallpaper(winner)
