@@ -164,3 +164,4 @@ def change_wallpaper(directories=[]):
     collection = WPCollection(directories)
     winner = collection.draw()
     backend.set_wallpaper(winner)
+    return winner
