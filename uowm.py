@@ -37,11 +37,17 @@ if __name__ == '__main__':
             if cmd.strip() == "":
                 cmd = prev_cmd
 
-            if cmd == "change":
+            split_args = cmd.split(' ')
+            if split_args[0] == "change":
                 prev_cmd = cmd
-                winner = change_wallpaper(options.directories)
+                if len(split_args) > 2:
+                    winner = change_wallpaper(split_args[1:])
+                elif len(split_args) > 1:
+                    winner = change_wallpaper(split_args[1:])
+                else:
+                    winner = change_wallpaper(options.directories)
                 print winner
-            elif cmd == "exit":
+            elif split_args[0] == "exit":
                 prev_cmd = cmd
                 print "So long and thanks for all the fish."
                 sys.exit()
