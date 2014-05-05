@@ -5,8 +5,12 @@
 import sys
 from uowmlib import change_wallpaper
 import argparse
+from multiprocessing import Process, Value
+from time import sleep, time
 
 options = {}
+loop_proc = None
+last_change_ts = Value('i', 0)
 
 """ --- TODO --- 
 * Tornado server
@@ -15,6 +19,27 @@ options = {}
 * tag wallpapers
 * grade wallpapers
 """
+
+def change_wallpaper_loop(sleep_secs, wp_dirs, last_change_ts):
+    sleep_secs = int(sleep_secs)
+    while 1:
+        now = int(time())
+        if now - last_change_ts.value >= sleep_secs:
+            change_wallpaper(wp_dirs)
+            last_change_ts.value = now
+        sleep(sleep_secs)
+        
+def terminate_wallpaper_loop():
+    global loop_proc
+    if loop_proc is not None:
+        loop_proc.terminate()
+
+def cmd_change(split_args, directories):
+    global last_change_ts
+    dirs = split_args[1:] if len(split_args) > 1 else directories
+    winner = change_wallpaper(dirs)
+    last_change_ts.value = int(time()) 
+    print winner
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -40,16 +65,26 @@ if __name__ == '__main__':
             split_args = cmd.split(' ')
             if split_args[0] == "change":
                 prev_cmd = cmd
-                if len(split_args) > 2:
-                    winner = change_wallpaper(split_args[1:])
-                elif len(split_args) > 1:
-                    winner = change_wallpaper(split_args[1:])
-                else:
-                    winner = change_wallpaper(options.directories)
-                print winner
-            elif split_args[0] == "exit":
+                cmd_change(split_args, options.directories)
+
+            elif split_args[0] == "startloop":
                 prev_cmd = cmd
+                if len(split_args) > 1:
+                    sleep_secs = split_args[1]
+                else:
+                    sleep_secs = 30
+                print "Changing wallpaper every "+str(sleep_secs)+" seconds."
+                loop_proc = Process(target=change_wallpaper_loop, 
+                                    args=(sleep_secs, options.directories,
+                                        last_change_ts))
+                loop_proc.start()
+            elif split_args[0] == "endloop":
+                prev_cmd = cmd
+                print "Stopped automatic wallpaper change."
+                terminate_wallpaper_loop()
+            elif split_args[0] == "exit":
                 print "So long and thanks for all the fish."
+                terminate_wallpaper_loop()
                 sys.exit()
             else:
                 print "Don't know how to do ["+str(cmd)+"]."
