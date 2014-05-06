@@ -1,0 +1,9 @@
+[general]
+default_dirs:
+  /home/pedro/wallpapers
+#  /home/pedro/other_dir
+append_default_dirs: NO
+log_file: /home/pedro/.uowm/log
+no_repeat: 20
+cycle_dirs: YES
+backend: Noop
