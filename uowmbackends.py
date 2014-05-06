@@ -27,3 +27,6 @@ class WPBackendXmonad(object):
         def set_wallpaper(self, wpaper):
             os.system("/usr/bin/feh --bg-max "+wpaper);
 
+class WPBackendNoop(object):
+    def set_wallpaper(self, wpaper):
+        print wpaper
