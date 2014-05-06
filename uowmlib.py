@@ -10,7 +10,7 @@ from itertools import cycle
 from ConfigParser import ConfigParser, NoOptionError
 import magic
 import mimetypes
-from uowmbackends import WPBackendGsettings
+import uowmbackends 
 
 
 class WPConfiguration(object):
@@ -41,6 +41,10 @@ class WPConfiguration(object):
         except NoOptionError:
             self.no_repeat = 20 # Check previous 20 files for wallpaper repetition
 
+        try:
+            self.backend = self._conf.get('general', 'backend')
+        except NoOptionError:
+            self.backend = 'Noop'
         self.cycle_dirs = self._bool_par('cycle_dirs', False)
 
     def _bool_par(self, par_name, default_val=False):
@@ -160,7 +164,11 @@ class WPCollection(object):
 
 def change_wallpaper(directories=[]):
     conf = WPConfiguration()
-    backend = WPBackendGsettings()
+    try:
+        backend = getattr(uowmbackends, 'WPBackend'+conf.backend)()
+    except AttributeError:
+        print "Backend "+conf.backend+" not found."
+        sys.exit()
     collection = WPCollection(directories)
     winner = collection.draw()
     backend.set_wallpaper(winner)
