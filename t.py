@@ -1,4 +1,4 @@
-from uowms import WPCollection, WPBackendGsettings
+from uowmlib import WPCollection, WPBackendGsettings
 import unittest
 from shell import shell
 
