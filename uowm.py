@@ -39,6 +39,7 @@ class WPCmd(object):
     def __terminate_wallpaper_loop(self):
         if self.loop_proc is not None:
             self.loop_proc.terminate()
+            self.loop_proc = None
 
     def change(self, split_args):
         dirs = split_args[1:] if len(split_args) > 1 else self.directories
@@ -47,15 +48,16 @@ class WPCmd(object):
         print winner
     
     def startloop(self, split_args):
-        if len(split_args) > 1:
-            sleep_secs = split_args[1]
-        else:
-            sleep_secs = 30
-        print "Changing wallpaper every "+str(sleep_secs)+" seconds."
-        self.loop_proc = Process(target=WPCmd.change_wallpaper_loop, 
-                                 args=(sleep_secs, self.directories,
-                                       self.last_change_ts))
-        self.loop_proc.start()
+        if self.loop_proc is None:
+            if len(split_args) > 1:
+                sleep_secs = split_args[1]
+            else:
+                sleep_secs = 30
+            print "Changing wallpaper every "+str(sleep_secs)+" seconds."
+            self.loop_proc = Process(target=WPCmd.change_wallpaper_loop, 
+                                     args=(sleep_secs, self.directories,
+                                           self.last_change_ts))
+            self.loop_proc.start()
 
     def endloop(self, split_args):
         print "Stopped automatic wallpaper change."
