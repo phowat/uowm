@@ -88,10 +88,15 @@ class WPLog(object):
             stdout=subprocess.PIPE).communicate()[0]
         last_n = filter(lambda x: len(x) > 0, last_n.split('\n'))
         return last_n
+
     def in_last(self, n, candidate):
         last_n = self.fetch_last(n)
         for line in last_n:
-            filename = line.split(' ', 1)[1]
+            try:
+                filename = line.split(' ', 1)[1]
+            except IndexError:
+                #Corrupted log line. skip it.
+                continue
             if candidate == filename:
                 return True
         return False
