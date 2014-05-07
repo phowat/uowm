@@ -37,7 +37,7 @@ class WPConfiguration(object):
             self.log_file = homedir+"/.uowm/log"
 
         try:
-            self.no_repeat = self._conf.get('general', 'no_repeat')
+            self.no_repeat = int(self._conf.get('general', 'no_repeat'))
         except NoOptionError:
             self.no_repeat = 20 # Check previous 20 files for wallpaper repetition
 
