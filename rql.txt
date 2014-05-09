@@ -1,0 +1,2 @@
+r.db('uowm').table('config').insert({hostname: 'wintermute', append_default_dirs: false, log_file: '/home/pedro/.uowm/log', no_repeat: '20', cycle_dirs: true, backend: 'Noop' })    
+r.db('uowm').table('config').indexCreate('hostname')
