@@ -3,14 +3,14 @@
 
 import atexit
 import os
-import code
 import readline
 import cmd
 from uowmcmd import WPCmd
 import sys
 
 class WPConsole(cmd.Cmd):
-    def __init__(self, dirs=[]):
+    def __init__(self, dirs=[],
+                 histfile=os.path.expanduser("~/.uowm/history")):
         cmd.Cmd.__init__(self)
         self.prompt = ">> "
         self.intro = """
@@ -25,7 +25,25 @@ class WPConsole(cmd.Cmd):
    
      Unecessarily Overengineed Wallpaper Manager
         """
+        self.histfile = histfile
+        self.init_history()
         self.wpcmd = WPCmd(dirs)
+
+
+    def init_history(self):
+        readline.parse_and_bind("tab: complete")
+        if hasattr(readline, "read_history_file"):
+            try:
+                readline.read_history_file(self.histfile)
+            except IOError:
+                pass
+            atexit.register(self.save_history)
+
+    def save_history(self):
+        readline.write_history_file(self.histfile)
+
+    def postcmd(self, stop, line):
+        self.save_history()
 
     def do_change(self, args):
         '[dir1 dir2 ...] - Changes current wallpaper once'
