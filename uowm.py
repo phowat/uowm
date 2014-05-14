@@ -32,23 +32,7 @@ if __name__ == '__main__':
         main()
     elif options.cli is True:
         from uowmconsole import WPConsole
-        prev_cmd = ""
         console = WPConsole(dirs=options.directories)
         console.cmdloop()
-        """
-        while 1:
-            cur_cmd = raw_input("> ")
-            if cur_cmd.strip() == "":
-                cur_cmd = prev_cmd
-            split_args = cur_cmd.split(' ')
-
-            try:
-                cmd_func = getattr(cmd, split_args[0])
-            except AttributeError:
-                print "Don't know how to do ["+str(cur_cmd)+"]."
-            else:
-                prev_cmd = cur_cmd
-                cmd_func(split_args)
-        """
     else:
         change_wallpaper(options.directories)
