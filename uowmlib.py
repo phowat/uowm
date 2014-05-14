@@ -9,12 +9,15 @@ from time import time
 from itertools import cycle
 from ConfigParser import ConfigParser, NoOptionError
 import magic
+import rethinkdb as r
+from socket import gethostname
 import mimetypes
 import uowmbackends 
 
 
 class WPConfiguration(object):
     def __init__(self, confpath=None):
+        _conn = r.connect(db='uowm')
         self._conf = ConfigParser()
         homedir = os.path.expanduser('~')
         if confpath is None:
@@ -29,38 +32,20 @@ class WPConfiguration(object):
             self.default_dirs = filter(
                 lambda x: len(x) > 0, default_dirs.split('\n'))
 
-        self.append_default_dirs = self._bool_par('append_default_dirs', False)
+        confs = r.table('config').\
+               filter(r.row['hostname'] == gethostname()).\
+               limit(1).run(_conn)
+        # TODO: There's gotta be a better way...
+        conf = {}
+        for c in confs:
+            conf = c
+            break
+        self.append_default_dirs = conf.get('append_default_dirs', False)
+        self.log_file = conf.get('log_file',homedir+"/.uowm/log")
+        self.no_repeat = int(conf.get('no_repeat', 20))
+        self.backend = conf.get('backend', 'Noop')
+        self.cycle_dirs = conf.get('cycle_dirs', False)
 
-        try:
-            self.log_file = self._conf.get('general', 'log_file')
-        except NoOptionError:
-            self.log_file = homedir+"/.uowm/log"
-
-        try:
-            self.no_repeat = int(self._conf.get('general', 'no_repeat'))
-        except NoOptionError:
-            self.no_repeat = 20 # Check previous 20 files for wallpaper repetition
-
-        try:
-            self.backend = self._conf.get('general', 'backend')
-        except NoOptionError:
-            self.backend = 'Noop'
-        self.cycle_dirs = self._bool_par('cycle_dirs', False)
-
-    def _bool_par(self, par_name, default_val=False):
-        try:
-            par_val = self._conf.get('general', par_name)
-        except NoOptionError:
-            par_val = default_val
-        else:
-            if par_val == 'YES':
-                par_val = True
-            elif par_val == 'NO':
-                par_val = False
-            else:
-                print "[CONF] [WARNING] "+par_name+" should be YES|NO."
-                par_val = False
-        return par_val
 
 class WPLog(object):
 
