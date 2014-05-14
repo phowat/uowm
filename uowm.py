@@ -24,6 +24,9 @@ if __name__ == '__main__':
     parser.add_argument("-c", "--cli",
         action="store_true", dest="cli", default=False,
         help="Starts as a cli.")
+    parser.add_argument("-C", "--collection",
+        dest="collection", default="default", 
+        help="Use other collecion instead of default one")
     parser.add_argument("directories",  nargs=argparse.REMAINDER, default=[])
     options = parser.parse_args()
 
@@ -32,7 +35,9 @@ if __name__ == '__main__':
         main()
     elif options.cli is True:
         from uowmconsole import WPConsole
-        console = WPConsole(dirs=options.directories)
+        console = WPConsole(dirs=options.directories,
+                            collection=options.collection)
         console.cmdloop()
     else:
-        change_wallpaper(options.directories)
+        print options.collection
+        change_wallpaper(options.directories, options.collection)

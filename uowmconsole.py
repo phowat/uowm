@@ -9,7 +9,7 @@ from uowmcmd import WPCmd
 import sys
 
 class WPConsole(cmd.Cmd):
-    def __init__(self, dirs=[],
+    def __init__(self, dirs=[], collection=None,
                  histfile=os.path.expanduser("~/.uowm/history")):
         cmd.Cmd.__init__(self)
         self.prompt = ">> "
@@ -27,7 +27,7 @@ class WPConsole(cmd.Cmd):
         """
         self.histfile = histfile
         self.init_history()
-        self.wpcmd = WPCmd(dirs)
+        self.wpcmd = WPCmd(dirs, collection)
 
 
     def init_history(self):

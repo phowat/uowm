@@ -3,24 +3,26 @@
 
 import sys
 from uowmlib import change_wallpaper
-from multiprocessing import Process, Value
+from multiprocessing import Process, Value, Array
 from time import sleep, time
 
 class WPCmd(object):
 
-    def __init__(self, directories):
+    def __init__(self, directories, collection):
         self.directories = directories
         self.loop_proc = None
         self.last_change_ts = Value('i', 0)
+        self.collection = Array('c', 64)
+        self.collection.value = collection
 
     @staticmethod
-    def change_wallpaper_loop(sleep_secs, wp_dirs, last_change_ts):
+    def change_wallpaper_loop(sleep_secs, wp_dirs, last_change_ts, collection):
 
         sleep_secs = int(sleep_secs)
         while 1:
             now = int(time())
             if now - last_change_ts.value >= sleep_secs:
-                change_wallpaper(wp_dirs)
+                change_wallpaper(wp_dirs, collection.value)
                 last_change_ts.value = now
             sleep(sleep_secs)
             
@@ -31,7 +33,7 @@ class WPCmd(object):
 
     def change(self, split_args):
         dirs = split_args if len(split_args) > 0 else self.directories
-        winner = change_wallpaper(dirs)
+        winner = change_wallpaper(dirs, self.collection)
         self.last_change_ts.value = int(time()) 
         print winner
     
@@ -44,7 +46,8 @@ class WPCmd(object):
             print "Changing wallpaper every "+str(sleep_secs)+" seconds."
             self.loop_proc = Process(target=WPCmd.change_wallpaper_loop, 
                                      args=(sleep_secs, self.directories,
-                                           self.last_change_ts))
+                                           self.last_change_ts,
+                                           self.collection))
             self.loop_proc.start()
 
     def endloop(self, split_args=[]):
