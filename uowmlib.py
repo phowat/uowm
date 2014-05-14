@@ -7,7 +7,6 @@ import random
 import subprocess
 from time import time
 from itertools import cycle
-from ConfigParser import ConfigParser, NoOptionError
 import magic
 import rethinkdb as r
 from socket import gethostname
@@ -18,30 +17,27 @@ import uowmbackends
 class WPConfiguration(object):
     def __init__(self, confpath=None):
         _conn = r.connect(db='uowm')
-        self._conf = ConfigParser()
+        hostname = gethostname()
         homedir = os.path.expanduser('~')
-        if confpath is None:
-            self._conf.read(homedir+'/.uowmrc')
-        else:
-            self._conf.read(confpath)
-        try:
-            default_dirs = self._conf.get('general', 'default_dirs')
-        except NoOptionError:
-            self.default_dirs = []
-        else:
-            self.default_dirs = filter(
-                lambda x: len(x) > 0, default_dirs.split('\n'))
+        cols = r.table('collections').\
+               filter(r.row['hostname'] == hostname).run(_conn)
+
+        self.collections = {}
+        for col in cols:
+            self.collections[col['name']] = col['collection']
 
         confs = r.table('config').\
-               filter(r.row['hostname'] == gethostname()).\
+               filter(r.row['hostname'] == hostname).\
                limit(1).run(_conn)
         # TODO: There's gotta be a better way...
         conf = {}
         for c in confs:
             conf = c
             break
-        self.append_default_dirs = conf.get('append_default_dirs', False)
+        #TODO: Rename append to collection. 
+        self.append_default_dirs = conf.get('append_default_dirs', False) 
         self.log_file = conf.get('log_file',homedir+"/.uowm/log")
+
         self.no_repeat = int(conf.get('no_repeat', 20))
         self.backend = conf.get('backend', 'Noop')
         self.cycle_dirs = conf.get('cycle_dirs', False)
@@ -88,17 +84,18 @@ class WPLog(object):
 
 class WPCollection(object):
     
-    def __init__(self, directories):
+    def __init__(self, directories, collection_name):
         self.log = WPLog()
         self.conf = WPConfiguration()
         self.file_list = []
+        collection = self.conf.collections.get(collection_name, []);
         if self.conf.append_default_dirs is True: 
-            directories = directories + self.conf.default_dirs
+            directories = directories + collection
         elif len(directories) < 1:
-            if len(self.conf.default_dirs) < 1:
+            if len(collection) < 1:
                 raise RuntimeError("No wallpapers directories defined.")
             else:
-                directories = self.conf.default_dirs
+                directories = collection
 
         if self.conf.cycle_dirs is True:
             directories = self._cycle_dirs(directories)
@@ -152,14 +149,14 @@ class WPCollection(object):
         return chosen
 
 
-def change_wallpaper(directories=[]):
+def change_wallpaper(directories=[], collection="default"):
     conf = WPConfiguration()
     try:
         backend = getattr(uowmbackends, 'WPBackend'+conf.backend)()
     except AttributeError:
         print "Backend "+conf.backend+" not found."
         sys.exit()
-    collection = WPCollection(directories)
+    collection = WPCollection(directories, collection)
     winner = collection.draw()
     backend.set_wallpaper(winner)
     return winner
