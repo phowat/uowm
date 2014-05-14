@@ -15,7 +15,7 @@ class WPConsole(cmd.Cmd):
         self.wpcmd = WPCmd(dirs)
 
     def do_change(self, args):
-        'bla bla wp change'
+        '[dir1 dir2 ...] - Changes current wallpaper once'
         if len(args):
             split_args = args.split(' ')
         else:
@@ -23,7 +23,7 @@ class WPConsole(cmd.Cmd):
         self.wpcmd.change(split_args)
 
     def do_startloop(self, args):
-        'bla bla wp startloop'
+        '[interval] - Starts wallpaper change loop every N seconds'
         print len(args)
         if len(args) > 0:
             split_args = args.split(' ')
@@ -32,9 +32,9 @@ class WPConsole(cmd.Cmd):
         self.wpcmd.startloop(split_args)
 
     def do_endloop(self, args):
-        'bla bla wp endloop'
+        'Stops change loop'
         self.wpcmd.endloop()
 
     def do_exit(self, args):
-        'some help text'
+        'Stops any running loop and ends the CLI'
         self.wpcmd.exit() 
