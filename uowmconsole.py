@@ -31,10 +31,10 @@ class WPConsole(cmd.Cmd):
             split_args = []
         self.wpcmd.startloop(split_args)
 
-    def do_endloop(self):
+    def do_endloop(self, args):
         'bla bla wp endloop'
         self.wpcmd.endloop()
 
-    def do_exit(self):
+    def do_exit(self, args):
         'some help text'
         self.wpcmd.exit() 
