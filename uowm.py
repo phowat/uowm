@@ -39,5 +39,4 @@ if __name__ == '__main__':
                             collection=options.collection)
         console.cmdloop()
     else:
-        print options.collection
         change_wallpaper(options.directories, options.collection)
