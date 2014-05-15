@@ -54,8 +54,7 @@ class WPConsole(cmd.Cmd):
         self.wpcmd.change(split_args)
 
     def do_startloop(self, args):
-        '[interval] - Starts wallpaper change loop every N seconds'
-        print len(args)
+        '[interval collection] - Starts wallpaper change loop every N seconds'
         if len(args) > 0:
             split_args = args.split(' ')
         else:
@@ -65,6 +64,21 @@ class WPConsole(cmd.Cmd):
     def do_endloop(self, args):
         'Stops change loop'
         self.wpcmd.endloop()
+
+    def do_getconf(self, args):
+        "Display configuration parameters"
+        if len(args) < 1:
+            print "Missing parameter" 
+        else:
+            print "{0}: [{1}]".format(args, self.wpcmd.getconf(args))
+
+
+    def do_setconf(self, args):
+        "name new_value - Sets configuration parameters"
+        split_args = args.split(' ')
+        if len(split_args) < 2:
+            print "Missing parameters" 
+        self.wpcmd.setconf(split_args[0], split_args[1])
 
     def do_exit(self, args):
         'Stops any running loop and ends the CLI'

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from uowmlib import change_wallpaper
+from uowmlib import WPConfiguration, change_wallpaper
 from multiprocessing import Process, Value, Array
 from time import sleep, time
 
@@ -43,7 +43,11 @@ class WPCmd(object):
                 sleep_secs = split_args[0]
             else:
                 sleep_secs = 30
-            print "Changing wallpaper every "+str(sleep_secs)+" seconds."
+            if len(split_args) > 1:
+                self.collection.value = split_args[1]
+
+            print "Changing wallpaper every {0} seconds from collection {1}.".\
+                  format(str(sleep_secs), self.collection.value)
             self.loop_proc = Process(target=WPCmd.change_wallpaper_loop, 
                                      args=(sleep_secs, self.directories,
                                            self.last_change_ts,
@@ -53,6 +57,20 @@ class WPCmd(object):
     def endloop(self, split_args=[]):
         print "Stopped automatic wallpaper change."
         self.__terminate_wallpaper_loop()
+
+    def getconf(self, parameter):
+        conf = WPConfiguration()
+        if parameter == 'collection':
+            return self.collection.value
+        else: 
+            try:
+                return getattr(conf, parameter)
+            except AttributeError:
+                return "PARAMETER NOT FOUND"
+
+    def setconf(self, parameter, value):
+        conf = WPConfiguration()
+        conf.set(parameter, value)
 
     def exit(self, split_args=[]):
         print "So long and thanks for all the fish."

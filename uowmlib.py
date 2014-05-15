@@ -15,7 +15,7 @@ import uowmbackends
 
 
 class WPConfiguration(object):
-    def __init__(self, confpath=None):
+    def __init__(self):
         _conn = r.connect(db='uowm')
         hostname = gethostname()
         homedir = os.path.expanduser('~')
@@ -34,6 +34,7 @@ class WPConfiguration(object):
         for c in confs:
             conf = c
             break
+        self.id = conf['id']
         #TODO: Rename append to collection. 
         self.append_default_dirs = conf.get('append_default_dirs', False) 
         self.log_file = conf.get('log_file',homedir+"/.uowm/log")
@@ -42,6 +43,10 @@ class WPConfiguration(object):
         self.backend = conf.get('backend', 'Noop')
         self.cycle_dirs = conf.get('cycle_dirs', False)
 
+    def set(self, param, value):
+        _conn = r.connect(db='uowm')
+        r.table('config').get(self.id).update({param: value}).run(_conn)
+    
 
 class WPLog(object):
 
