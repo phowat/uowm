@@ -63,9 +63,9 @@ class WPLog(object):
 
     def add(self, filepath):
         timestamp = str(int(time()))
-        line = "[{0}] {1}\n".format(timestamp, filepath)
+        line = u"[{0}] {1}\n".format(timestamp, filepath)
         logfile = open(self.conf.log_file, 'a')
-        logfile.write(line)
+        logfile.write(line.encode('utf-8'))
         logfile.close()
 
     def fetch_last(self, n):
