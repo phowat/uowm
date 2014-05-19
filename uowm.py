@@ -30,13 +30,16 @@ if __name__ == '__main__':
     parser.add_argument("directories",  nargs=argparse.REMAINDER, default=[])
     options = parser.parse_args()
 
+    directories = map(lambda(x): x.decode('utf8') if isinstance(x, str) else x,
+                      options.directories)
+
     if options.server is True:
         from uowms import main
         main()
     elif options.cli is True:
         from uowmconsole import WPConsole
-        console = WPConsole(dirs=options.directories,
+        console = WPConsole(dirs=directories,
                             collection=options.collection)
         console.cmdloop()
     else:
-        change_wallpaper(options.directories, options.collection)
+        change_wallpaper(directories, options.collection)
