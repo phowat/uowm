@@ -61,6 +61,13 @@ class WPConsole(cmd.Cmd):
             split_args = []
         self.wpcmd.startloop(split_args)
 
+    def do_delay(self, args):
+        '[seconds] - Delays the execution of next change loop. Defaults to 30.'
+        if len(args) > 0:
+            delay = int(args)
+        else:
+            delay = 30
+        self.wpcmd.delay(delay)
     def do_endloop(self, args):
         'Stops change loop'
         self.wpcmd.endloop()

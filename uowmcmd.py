@@ -37,6 +37,9 @@ class WPCmd(object):
         self.last_change_ts.value = int(time()) 
         print winner
     
+    def delay(self, seconds=30):
+        self.last_change_ts.value = int(time())+int(seconds)
+
     def startloop(self, split_args):
         if self.loop_proc is None:
             if len(split_args) > 0:
