@@ -150,7 +150,12 @@ class WPCollection(object):
         chosen = None
         while chosen is None:
             candidate = random.choice(self.file_list)
-            if not self.log.in_last(self.conf.no_repeat, candidate):
+            if len(self.file_list) > self.conf.no_repeat:
+                if not self.log.in_last(self.conf.no_repeat, candidate):
+                    chosen = candidate
+            else:
+                print "This collection has less items than the no_repeat \
+parameter. We cannot guarantee this."
                 chosen = candidate
         self.log.add(chosen)
         return chosen
