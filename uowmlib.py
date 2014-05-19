@@ -12,6 +12,7 @@ import rethinkdb as r
 from socket import gethostname
 import mimetypes
 import uowmbackends 
+import codecs
 
 
 class WPConfiguration(object):
@@ -64,8 +65,8 @@ class WPLog(object):
     def add(self, filepath):
         timestamp = str(int(time()))
         line = u"[{0}] {1}\n".format(timestamp, filepath)
-        logfile = open(self.conf.log_file, 'a')
-        logfile.write(line.encode('utf-8'))
+        logfile = codecs.open(self.conf.log_file, 'a', 'utf-8')
+        logfile.write(line)
         logfile.close()
 
     def fetch_last(self, n):
@@ -83,6 +84,7 @@ class WPLog(object):
             except IndexError:
                 #Corrupted log line. skip it.
                 continue
+            filename = filename.decode('utf8')
             if candidate == filename:
                 return True
         return False
@@ -106,7 +108,7 @@ class WPCollection(object):
             directories = self._cycle_dirs(directories)
 
         for directory in directories:
-            for root, subFolders, files in os.walk(directory, followlinks=True):
+            for root, subFolders, files in os.walk(unicode(directory), followlinks=True):
                 for f in files:
                     fullpath = os.path.join(root, f)
                     (mime, enc) = mimetypes.guess_type(fullpath)
