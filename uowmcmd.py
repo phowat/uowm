@@ -14,15 +14,19 @@ class WPCmd(object):
         self.last_change_ts = Value('i', 0)
         self.collection = Array('c', 64)
         self.collection.value = collection
+        self._conf = WPConfiguration()
 
     @staticmethod
-    def change_wallpaper_loop(sleep_secs, wp_dirs, last_change_ts, collection):
+    def change_wallpaper_loop(sleep_secs, wp_dirs, last_change_ts, collection, 
+                              wpconf):
 
+        # right now, wpconf here is just a copy of the WPConfig object.
+        # when I implement a reload method, this will need to change. TODO
         sleep_secs = int(sleep_secs)
         while 1:
             now = int(time())
             if now - last_change_ts.value >= sleep_secs:
-                change_wallpaper(wp_dirs, collection.value)
+                change_wallpaper(wp_dirs, collection.value, wpconf)
                 last_change_ts.value = now
             sleep(sleep_secs)
             
@@ -33,7 +37,7 @@ class WPCmd(object):
 
     def change(self, split_args):
         dirs = split_args if len(split_args) > 0 else self.directories
-        winner = change_wallpaper(dirs, self.collection)
+        winner = change_wallpaper(dirs, self.collection, self.wpconf)
         self.last_change_ts.value = int(time()) 
         print winner
     
@@ -54,7 +58,7 @@ class WPCmd(object):
             self.loop_proc = Process(target=WPCmd.change_wallpaper_loop, 
                                      args=(sleep_secs, self.directories,
                                            self.last_change_ts,
-                                           self.collection))
+                                           self.collection, self._conf))
             self.loop_proc.start()
 
     def endloop(self, split_args=[]):
@@ -62,18 +66,16 @@ class WPCmd(object):
         self.__terminate_wallpaper_loop()
 
     def getconf(self, parameter):
-        conf = WPConfiguration()
         if parameter == 'collection':
             return self.collection.value
         else: 
             try:
-                return getattr(conf, parameter)
+                return getattr(self._conf, parameter)
             except AttributeError:
                 return "PARAMETER NOT FOUND"
 
     def setconf(self, parameter, value):
-        conf = WPConfiguration()
-        conf.set(parameter, value)
+        self._conf.set(parameter, value)
 
     def exit(self, split_args=[]):
         print "So long and thanks for all the fish."

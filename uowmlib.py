@@ -51,8 +51,8 @@ class WPConfiguration(object):
 
 class WPLog(object):
 
-    def __init__(self):
-        self.conf = WPConfiguration()
+    def __init__(self, wpconf):
+        self.conf = wpconf
         # Make sure path exists
         logdir = self.conf.log_file[0:self.conf.log_file.rindex("/")]
         if not os.path.exists(logdir):
@@ -91,9 +91,9 @@ class WPLog(object):
 
 class WPCollection(object):
     
-    def __init__(self, directories, collection_name):
-        self.log = WPLog()
-        self.conf = WPConfiguration()
+    def __init__(self, directories, collection_name, wpconf):
+        self.log = WPLog(wpconf)
+        self.conf = wpconf
         self.file_list = []
         collection = self.conf.collections.get(collection_name, []);
         if self.conf.append_default_dirs is True: 
@@ -161,14 +161,16 @@ parameter. We cannot guarantee this."
         return chosen
 
 
-def change_wallpaper(directories=[], collection="default"):
-    conf = WPConfiguration()
+def change_wallpaper(directories=[], collection="default", conf=None):
+
+    if conf is None:
+        conf = WPConfiguration()
     try:
         backend = getattr(uowmbackends, 'WPBackend'+conf.backend)()
     except AttributeError:
         print "Backend "+conf.backend+" not found."
         sys.exit()
-    collection = WPCollection(directories, collection)
+    collection = WPCollection(directories, collection, conf)
     winner = collection.draw()
     backend.set_wallpaper(winner)
     return winner
