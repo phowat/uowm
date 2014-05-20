@@ -37,7 +37,7 @@ class WPCmd(object):
 
     def change(self, split_args):
         dirs = split_args if len(split_args) > 0 else self.directories
-        winner = change_wallpaper(dirs, self.collection, self._conf)
+        winner = change_wallpaper(dirs, self.collection.value, self._conf)
         self.last_change_ts.value = int(time()) 
         print winner
     
