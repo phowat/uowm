@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # Unnecessarily Overengineered Wallpaper Manager
 
-from uowmlib import change_wallpaper
 import argparse
 
 options = {}
@@ -36,10 +35,11 @@ if __name__ == '__main__':
     if options.server is True:
         from uowms import main
         main()
-    elif options.cli is True:
+    else:
         from uowmconsole import WPConsole
         console = WPConsole(dirs=directories,
                             collection=options.collection)
-        console.cmdloop()
-    else:
-        change_wallpaper(directories, options.collection)
+        if options.cli is True:
+            console.cmdloop()
+        else:
+            console.do_change(" ".join(directories))
