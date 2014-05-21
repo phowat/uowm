@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from uowmlib import WPConfiguration, change_wallpaper
+from uowmlib import WPConfiguration, change_wallpaper, apply_wallpaper
 from multiprocessing import Process, Value, Array
 from time import sleep, time
+import os
 
 class WPCmd(object):
 
@@ -37,9 +38,14 @@ class WPCmd(object):
 
     def change(self, split_args):
         dirs = split_args if len(split_args) > 0 else self.directories
-        winner = change_wallpaper(dirs, self.collection.value, self._conf)
+        if len(dirs) == 1 and os.path.isfile(dirs[0]):
+            # Check if this is a file instead of collection
+            apply_wallpaper(dirs[0], self._conf)
+        else:
+            winner = change_wallpaper(dirs, self.collection.value, self._conf)
+            print winner
+        
         self.last_change_ts.value = int(time()) 
-        print winner
     
     def delay(self, seconds=30):
         self.last_change_ts.value = int(time())+int(seconds)

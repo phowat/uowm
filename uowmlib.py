@@ -161,16 +161,20 @@ parameter. We cannot guarantee this."
         return chosen
 
 
-def change_wallpaper(directories=[], collection="default", conf=None):
+def draw_wallpaper(directories, collection, conf):
+    collection = WPCollection(directories, collection, conf)
+    return collection.draw()
 
-    if conf is None:
-        conf = WPConfiguration()
+def apply_wallpaper(winner, conf):
     try:
         backend = getattr(uowmbackends, 'WPBackend'+conf.backend)()
     except AttributeError:
         print "Backend "+conf.backend+" not found."
         sys.exit()
-    collection = WPCollection(directories, collection, conf)
-    winner = collection.draw()
     backend.set_wallpaper(winner)
     return winner
+
+def change_wallpaper(directories=[], collection="default", conf=None):
+    if conf is None:
+        conf = WPConfiguration()
+    return apply_wallpaper(draw_wallpaper(directories, collection, conf), conf)
