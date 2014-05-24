@@ -12,6 +12,7 @@ class WPCmd(object):
     def __init__(self, directories, collection):
         self.directories = directories
         self.loop_proc = None
+        self.sleep_secs = 0
         self.last_change_ts = Value('i', 0)
         self.collection = Array('c', 64)
         self.collection.value = collection
@@ -29,12 +30,13 @@ class WPCmd(object):
             if now - last_change_ts.value >= sleep_secs:
                 change_wallpaper(wp_dirs, collection.value, wpconf)
                 last_change_ts.value = now
-            sleep(sleep_secs)
+            sleep(1)
             
     def __terminate_wallpaper_loop(self):
         if self.loop_proc is not None:
             self.loop_proc.terminate()
             self.loop_proc = None
+            self.sleep_secs = 0
 
     def change(self, split_args):
         dirs = split_args if len(split_args) > 0 else self.directories
@@ -48,21 +50,23 @@ class WPCmd(object):
         self.last_change_ts.value = int(time()) 
     
     def delay(self, seconds=30):
-        self.last_change_ts.value = int(time())+int(seconds)
+        to_add = int(seconds) + \
+                 (self.sleep_secs - (int(time()) - self.last_change_ts.value))
+        self.last_change_ts.value = self.last_change_ts.value + to_add
 
     def startloop(self, split_args):
         if self.loop_proc is None:
             if len(split_args) > 0:
-                sleep_secs = split_args[0]
+                self.sleep_secs = int(split_args[0])
             else:
-                sleep_secs = 30
+                self.sleep_secs = 30
             if len(split_args) > 1:
                 self.collection.value = split_args[1]
 
             print "Changing wallpaper every {0} seconds from collection {1}.".\
-                  format(str(sleep_secs), self.collection.value)
+                  format(str(self.sleep_secs), self.collection.value)
             self.loop_proc = Process(target=WPCmd.change_wallpaper_loop, 
-                                     args=(sleep_secs, self.directories,
+                                     args=(self.sleep_secs, self.directories,
                                            self.last_change_ts,
                                            self.collection, self._conf))
             self.loop_proc.start()
