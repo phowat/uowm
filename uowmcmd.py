@@ -39,7 +39,9 @@ class WPCmd(object):
             self.sleep_secs = 0
 
     def change(self, split_args):
-        dirs = split_args if len(split_args) > 0 else self.directories
+        dirs = map(
+            lambda x: x if x[0] == '/' else self._conf.basedir+'/'+ x,
+            split_args if len(split_args) > 0 else self.directories)
         if len(dirs) == 1 and os.path.isfile(dirs[0]):
             # Check if this is a file instead of collection
             apply_wallpaper(dirs[0], self._conf)
