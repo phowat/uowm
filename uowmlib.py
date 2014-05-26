@@ -43,6 +43,7 @@ class WPConfiguration(object):
         self.no_repeat = int(conf.get('no_repeat', 20))
         self.backend = conf.get('backend', 'Noop')
         self.cycle_dirs = conf.get('cycle_dirs', False)
+        self.basedir = conf.get('basedir', homedir)
 
     def set(self, param, value):
         _conn = r.connect(db='uowm')
