@@ -38,10 +38,13 @@ class WPCmd(object):
             self.loop_proc = None
             self.sleep_secs = 0
 
-    def change(self, split_args):
-        dirs = map(
+    def _get_dirs(self, dirs):
+        return map(
             lambda x: x if x[0] == '/' else self._conf.basedir+'/'+ x,
-            split_args if len(split_args) > 0 else self.directories)
+            dirs if len(dirs) > 0 else self.directories)
+
+    def change(self, split_args):
+        dirs = self._get_dirs(split_args)
         if len(dirs) == 1 and os.path.isfile(dirs[0]):
             # Check if this is a file instead of collection
             apply_wallpaper(dirs[0], self._conf)
@@ -56,19 +59,25 @@ class WPCmd(object):
                  (self.sleep_secs - (int(time()) - self.last_change_ts.value))
         self.last_change_ts.value = self.last_change_ts.value + to_add
 
-    def startloop(self, split_args):
+    def startloop(self, split_args, dirs=False):
+        dir_list = None
         if self.loop_proc is None:
             if len(split_args) > 0:
                 self.sleep_secs = int(split_args[0])
             else:
                 self.sleep_secs = 30
             if len(split_args) > 1:
-                self.collection.value = split_args[1]
+                if dirs is False:
+                    self.collection.value = split_args[1]
+                else:
+                    dir_list = self._get_dirs(split_args[1:])
+            if dir_list is None:
+                dir_list = self.directories
 
             print "Changing wallpaper every {0} seconds from collection {1}.".\
                   format(str(self.sleep_secs), self.collection.value)
             self.loop_proc = Process(target=WPCmd.change_wallpaper_loop, 
-                                     args=(self.sleep_secs, self.directories,
+                                     args=(self.sleep_secs, dir_list,
                                            self.last_change_ts,
                                            self.collection, self._conf))
             self.loop_proc.start()

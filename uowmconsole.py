@@ -23,7 +23,7 @@ class WPConsole(cmd.Cmd):
   Y88b. .d88PY88b. .d88P8888P   Y8888888   "   888 
    "Y88888P"  "Y88888P" 888P     Y888888       888 
    
-     Unecessarily Overengineed Wallpaper Manager
+    Unecessarily Overengineered Wallpaper Manager
         """
         self.histfile = histfile
         self.init_history()
@@ -60,6 +60,14 @@ class WPConsole(cmd.Cmd):
         else:
             split_args = []
         self.wpcmd.startloop(split_args)
+
+    def do_startloop_dirs(self, args):
+        '[interval dir1 dir2 ...] - Starts wallpaper change loop every N seconds'
+        if len(args) > 0:
+            split_args = args.split(' ')
+        else:
+            split_args = []
+        self.wpcmd.startloop(split_args, dirs=True)
 
     def do_delay(self, args):
         '[seconds] - Delays the execution of next change loop. Defaults to 30.'
