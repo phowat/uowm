@@ -1,28 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import tornado.ioloop
-import tornado.web
-from uowmlib import change_wallpaper
+from flask import Flask, render_template
+from uowmlib import WPConfiguration
 
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.write("Hello, world")
+app = Flask(__name__)
 
-class ChangeWPHandler(tornado.web.RequestHandler):
-    def get(self):
-        response = {'response': 0}
-        change_wallpaper()
-        self.write(response)
+@app.route("/")
+def hello():
+    wpconf = WPConfiguration()
+    return render_template('index.html', conf=wpconf)#{'no_repeat': wpconf.no_repeat})
 
-application = tornado.web.Application([
-    (r"/", MainHandler),
-    (r"/change_wallpaper", ChangeWPHandler),
-])
-
-def main():
-    application.listen(8888)
-    tornado.ioloop.IOLoop.instance().start()
-
-if __name__ == '__main__':
-    main();
+if __name__ == "__main__":
+    app.debug = True
+    app.run()
