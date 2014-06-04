@@ -9,7 +9,7 @@ app = Flask(__name__)
 @app.route("/")
 def hello():
     wpconf = WPConfiguration()
-    return render_template('index.html', conf=wpconf)#{'no_repeat': wpconf.no_repeat})
+    return render_template('index.html', conf=wpconf)
 
 if __name__ == "__main__":
     app.debug = True
