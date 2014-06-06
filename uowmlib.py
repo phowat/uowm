@@ -46,9 +46,15 @@ class WPConfiguration(object):
         self.basedir = conf.get('basedir', homedir)
 
     def set(self, param, value):
-        _conn = r.connect(db='uowm')
-        r.table('config').get(self.id).update({param: value}).run(_conn)
-    
+        if value == 'yes':
+            value = True
+        elif value == 'no':
+            value = False
+        elif param == "no_repeat":
+            value = int(value)
+        if getattr(self, param) != value:
+            _conn = r.connect(db='uowm')
+            r.table('config').get(self.id).update({param: value}).run(_conn)
 
 class WPLog(object):
 

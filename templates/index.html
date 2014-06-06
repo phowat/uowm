@@ -1,36 +1,36 @@
 {% extends "layout.html" %}
 {% block body %}
-<form role="form">
+<form role="form" method="post">
   <div>
-    <label for="no-repeat">No Repeat</label>
-    <input type="number" min="1" max="100" id="no-repeat" value="{{ conf.no_repeat }}">
+    <label for="no_repeat">No Repeat</label>
+    <input type="number" min="1" max="100" id="no_repeat" name="no_repeat" value="{{ conf.no_repeat }}">
   </div>
   <div>
     <label for="backend">Backend</label>
-    <input type="text" id="backend" value="{{ conf.backend }}">
+    <input type="text" id="backend" name="backend" value="{{ conf.backend }}">
   </div>
   <div>
     <label for="log_file">Log File</label>
-    <input type="text" id="log_file" value="{{ conf.log_file }}">
+    <input type="text" id="log_file" name="log_file" value="{{ conf.log_file }}">
   </div>
   <div>
     <label for="basedir">Basedir</label>
-    <input type="text" id="basedir" value="{{ conf.basedir }}">
+    <input type="text" id="basedir" name="basedir" value="{{ conf.basedir }}">
   </div>
   <div>
     <label> Cycle Dirs </label>
     <label for="cycle_dirs-yes">Yes</label>
-    <input type="radio" id="cycle_dirs-yes" name="cycle_dirs" {% if conf.cycle_dirs == True %} checked {% endif %} >
+    <input type="radio" id="cycle_dirs-yes" name="cycle_dirs" value="yes" {% if conf.cycle_dirs == True %} checked {% endif %} >
     <label for="cycle_dirs-no">No</label>
-    <input type="radio" id="cycle_dirs-no" name="cycle_dirs" {% if conf.cycle_dirs == False %} checked {% endif %} >
+    <input type="radio" id="cycle_dirs-no" name="cycle_dirs" value="no" {% if conf.cycle_dirs == False %} checked {% endif %} >
   </div>
   <div>
     <label> Append Default Dirs </label>
     <label for="append_default_dirs-yes">Yes</label>
-    <input type="radio" id="append_default_dirs-yes" 
+    <input type="radio" id="append_default_dirs-yes" value="yes"
       name="append_default_dirs" {% if conf.append_default_dirs == True %} checked {% endif %} >
     <label for="append_default_dirs-no">No</label>
-    <input type="radio" id="append_default_dirs-yes" 
+    <input type="radio" id="append_default_dirs-yes" value="no"
       name="append_default_dirs" {% if conf.append_default_dirs == False %} checked {% endif %} >
   </div>
   <button type="submit">Submit</button>
