@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block body %}
+{% for name, col in collections.iteritems() %}
+  {{ name }} <br>
+  {% for dir in col %}
+    {{ dir }} <br>  
+  {% endfor %}
+{% endfor %}
+
+{% endblock %}
