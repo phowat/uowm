@@ -19,6 +19,10 @@ def config():
 def collections():
     wpconf = WPConfiguration()
     return render_template('collections.html', collections=wpconf.collections)
-if __name__ == "__main__":
+
+def main():
     app.debug = True
     app.run()
+
+if __name__ == "__main__":
+    main()

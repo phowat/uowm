@@ -7,7 +7,6 @@ import argparse
 options = {}
 
 """ --- TODO --- 
-* Tornado server
 * get one from same  "set"( dir for now) 
 * web interface, show wallpapers, let user click to set
 * tag wallpapers
