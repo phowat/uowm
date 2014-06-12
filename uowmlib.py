@@ -13,6 +13,7 @@ from socket import gethostname
 import mimetypes
 import uowmbackends 
 import codecs
+from uowmcollections import WPCollections
 
 
 class WPConfiguration(object):
@@ -20,12 +21,11 @@ class WPConfiguration(object):
         _conn = r.connect(db='uowm')
         hostname = gethostname()
         homedir = os.path.expanduser('~')
-        cols = r.table('collections').\
-               filter(r.row['hostname'] == hostname).run(_conn)
 
         self.collections = {}
-        for col in cols:
-            self.collections[col['name']] = col['collection']
+        wpc = WPCollections()
+        for cname in wpc.collections:
+            self.collections[cname] = wpc.collections[cname]['collection']
 
         confs = r.table('config').\
                filter(r.row['hostname'] == hostname).\
