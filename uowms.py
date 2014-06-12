@@ -3,6 +3,7 @@
 
 from flask import Flask, render_template, request
 from uowmlib import WPConfiguration
+from uowmcollections import WPCollections
 import pprint
 
 app = Flask(__name__)
@@ -17,7 +18,7 @@ def config():
 
 @app.route("/collections", methods=['GET', 'POST'])
 def collections():
-    wpconf = WPConfiguration()
+    wpconf = WPCollections()
     return render_template('collections.html', collections=wpconf.collections)
 
 def main():
