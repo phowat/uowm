@@ -4,6 +4,7 @@
 from os import walk
 import pprint
 import time
+import rethinkdb as r
 
 def list_files(basedir):
     paths = []
@@ -30,4 +31,11 @@ if __name__ == '__main__':
     basedir = "/home/pedro/wallpapers";
     paths = list_files(basedir)
     db_struct = create_structures(basedir, paths)
-    pprint.pprint(db_struct)
+    _conn = r.connect(db='uowm')
+    try:
+        r.table_create("wallpapers").run(_conn)
+    except r.errors.RqlRuntimeError:
+        #Already exists
+        pass
+    for entry in db_struct:
+        r.table('wallpapers').insert(entry).run(_conn)
