@@ -21,8 +21,7 @@ class WPBackendMate(object):
                '"file://'+wpaper+'"']
         subprocess.call(cmd)
         
-class WPBackendXmonad(object):
-    # Through feh.
+class WPBackendFeh(object):
         def set_wallpaper(self, wpaper):
             subprocess.call(['/usr/bin/feh', '--bg-max', wpaper])
 
