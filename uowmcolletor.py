@@ -37,5 +37,14 @@ if __name__ == '__main__':
     except r.errors.RqlRuntimeError:
         #Already exists
         pass
+    cur = r.table('wallpapers').\
+          filter(r.row['fullpath'] =='BUNDA').run(_conn)
+    
     for entry in db_struct:
-        r.table('wallpapers').insert(entry).run(_conn)
+        cur = r.table('wallpapers').\
+              filter(r.row['fullpath'] == entry['fullpath']).run(_conn)
+        
+        for c in cur:
+            break
+        else:
+            r.table('wallpapers').insert(entry).run(_conn)
