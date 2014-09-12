@@ -27,24 +27,38 @@ def create_structure(basedir, path):
 def create_structures(basedir, paths):
     return map(lambda x: create_structure(basedir, x), paths)
 
-if __name__ == '__main__':
-    basedir = "/home/pedro/wallpapers";
-    paths = list_files(basedir)
-    db_struct = create_structures(basedir, paths)
-    _conn = r.connect(db='uowm')
+def create_table(conn):
     try:
-        r.table_create("wallpapers").run(_conn)
+        r.table_create("wallpapers").run(conn)
+        created = True
     except r.errors.RqlRuntimeError:
         #Already exists
+        created = False 
         pass
-    cur = r.table('wallpapers').\
-          filter(r.row['fullpath'] =='BUNDA').run(_conn)
-    
+    return created
+
+def initialize_wallpapers(conn, db_struct):
     for entry in db_struct:
         cur = r.table('wallpapers').\
-              filter(r.row['fullpath'] == entry['fullpath']).run(_conn)
+              filter(r.row['fullpath'] == entry['fullpath']).run(conn)
         
         for c in cur:
             break
         else:
-            r.table('wallpapers').insert(entry).run(_conn)
+            r.table('wallpapers').insert(entry).run(conn)
+
+def update_wallpapers(conn, db_struct):
+    for entry in db_struct:
+        r.table('wallpapers').insert(entry).run(conn)
+
+if __name__ == '__main__':
+    basedir = "/home/pedro/wallpapers";
+    paths = list_files(basedir)
+    db_struct = create_structures(basedir, paths)
+    conn = r.connect(db='uowm')
+
+    if create_table(conn) is True:
+        initialize_wallpapers(conn, db_struct)
+    else:
+        update_wallpapers(conn, db_struct)
+
