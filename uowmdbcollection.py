@@ -38,9 +38,6 @@ class WPDBColletion(object):
                 self.file_list.append(fullpath)
 
     def draw(self):
-        chosen = random.choice(self.file_list)
-        self.log.add(chosen)
-        return chosen
         chosen = None
         while chosen is None:
             candidate = random.choice(self.file_list)
