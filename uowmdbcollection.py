@@ -38,10 +38,22 @@ class WPDBColletion(object):
                 self.file_list.append(fullpath)
 
     def draw(self):
-        #TODO: Reimplement no repeat
         chosen = random.choice(self.file_list)
         self.log.add(chosen)
         return chosen
+        chosen = None
+        while chosen is None:
+            candidate = random.choice(self.file_list)
+            if len(self.file_list) > self.conf.no_repeat:
+                if not self.log.in_last(self.conf.no_repeat, candidate):
+                    chosen = candidate
+            else:
+                print "This collection has less items than the no_repeat \
+parameter. We cannot guarantee this."
+                chosen = candidate
+        self.log.add(chosen)
+        return chosen
+
 def simple_drwa():
     _conn = r.connect(db='uowm')
     cur = r.table('wallpapers').\
