@@ -118,16 +118,7 @@ class WPCollection(object):
             for root, subFolders, files in os.walk(unicode(directory), followlinks=True):
                 for f in files:
                     fullpath = os.path.join(root, f)
-                    (mime, enc) = mimetypes.guess_type(fullpath)
-                    if mime is None:
-                        try:
-                            mime = magic.from_file(fullpath, mime=True).split("/")[0]
-                        except UnicodeDecodeError:
-                            print "Unable to determine mime type for"+fullpath
-                            continue
-
-                    filetype = mime.split("/")[0]
-                    if filetype == 'image':
+                    if is_image(fullpath):
                         self.file_list.append(fullpath)
 
         if len(self.file_list) < 1:
@@ -167,6 +158,20 @@ parameter. We cannot guarantee this."
         self.log.add(chosen)
         return chosen
 
+def is_image(fullpath):
+    (mime, enc) = mimetypes.guess_type(fullpath)
+    if mime is None:
+        try:
+            mime = magic.from_file(fullpath, mime=True).split("/")[0]
+        except UnicodeDecodeError:
+            print "Unable to determine mime type for"+fullpath
+            return False
+
+    filetype = mime.split("/")[0]
+    if filetype == 'image':
+        return True
+    else:
+        return False
 
 def draw_wallpaper(directories, collection, conf):
     collection = WPCollection(directories, collection, conf)

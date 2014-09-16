@@ -25,6 +25,7 @@ class WPDBColletion(object):
               filter(r.row['tags'].contains(tags[0])).run(_conn)
         for wallpaper in cur:
             fullpath = wallpaper['fullpath']
+            #TODO: Remove this code and use is_image() instead.
             (mime, enc) = mimetypes.guess_type(fullpath)
             if mime is None:
                 try:

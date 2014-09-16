@@ -5,6 +5,7 @@ from os import walk
 import pprint
 import time
 import rethinkdb as r
+from uowmlib import is_image
 
 def list_files(basedir):
     paths = []
@@ -17,7 +18,7 @@ def extract_tags(basedir, path):
 
 def create_structure(basedir, path):
     return {
-        'fullpath': path[0]+'/'+path[1],
+        'fullpath': (path[0]+'/'+path[1]).decode("utf8"),
         'name': path[1],
         'tags': extract_tags(basedir, path[0]),
         'added': int(time.time()),
@@ -25,7 +26,8 @@ def create_structure(basedir, path):
     }
 
 def create_structures(basedir, paths):
-    return map(lambda x: create_structure(basedir, x), paths)
+    return map(lambda x: create_structure(basedir, x), 
+               filter(lambda x: is_image(x[0]+'/'+x[1]), paths))
 
 def create_table(conn):
     try:
