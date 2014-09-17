@@ -41,6 +41,10 @@ def create_table(conn):
 
 def initialize_wallpapers(conn, db_struct):
     for entry in db_struct:
+        r.table('wallpapers').insert(entry).run(conn)
+
+def update_wallpapers(conn, db_struct):
+    for entry in db_struct:
         cur = r.table('wallpapers').\
               filter(r.row['fullpath'] == entry['fullpath']).run(conn)
         
@@ -48,10 +52,6 @@ def initialize_wallpapers(conn, db_struct):
             break
         else:
             r.table('wallpapers').insert(entry).run(conn)
-
-def update_wallpapers(conn, db_struct):
-    for entry in db_struct:
-        r.table('wallpapers').insert(entry).run(conn)
 
 if __name__ == '__main__':
     basedir = "/home/pedro/wallpapers";
