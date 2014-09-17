@@ -3,7 +3,7 @@
 
 import rethinkdb as r
 import random
-from uowmlib import WPConfiguration, WPLog
+from uowmlib import WPConfiguration, WPLog, is_image
 import mimetypes
 
 
@@ -25,17 +25,7 @@ class WPDBColletion(object):
               filter(r.row['tags'].contains(tags[0])).run(_conn)
         for wallpaper in cur:
             fullpath = wallpaper['fullpath']
-            #TODO: Remove this code and use is_image() instead.
-            (mime, enc) = mimetypes.guess_type(fullpath)
-            if mime is None:
-                try:
-                    mime = magic.from_file(fullpath, mime=True).split("/")[0]
-                except UnicodeDecodeError:
-                    print "Unable to determine mime type for"+fullpath
-                    continue
-
-            filetype = mime.split("/")[0]
-            if filetype == 'image':
+            if is_image(fullpath)
                 self.file_list.append(fullpath)
 
     def draw(self):
@@ -52,7 +42,7 @@ parameter. We cannot guarantee this."
         self.log.add(chosen)
         return chosen
 
-def simple_drwa():
+def simple_draw():
     _conn = r.connect(db='uowm')
     cur = r.table('wallpapers').\
           filter(r.row['tags'].contains("earthporn")).run(_conn)
