@@ -22,15 +22,16 @@ class WPDBColletion(object):
 
         _conn = r.connect(db='uowm')
         cur = r.table('wallpapers').\
-              filter(r.row['tags'].contains(tags[0])).run(_conn)
+              filter(r.row['tags'].contains(*tags)).run(_conn)
         for wallpaper in cur:
             fullpath = wallpaper['fullpath']
-            if is_image(fullpath)
+            if is_image(fullpath):
                 self.file_list.append(fullpath)
 
     def draw(self):
         chosen = None
         while chosen is None:
+            print len(self.file_list)
             candidate = random.choice(self.file_list)
             if len(self.file_list) > self.conf.no_repeat:
                 if not self.log.in_last(self.conf.no_repeat, candidate):
