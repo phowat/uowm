@@ -5,6 +5,7 @@ import rethinkdb as r
 import random
 from uowmlib import WPConfiguration, WPLog, is_image
 import mimetypes
+import json
 
 
 #TODO: 
@@ -14,15 +15,28 @@ import mimetypes
 
 class WPDBColletion(object):
 
-    def __init__(self, tags, wpconf):
+    def __init__(self, tags, wpconf, tag_match="AND"):
+        def match_or(wp):
+            for tag in wp['tags']:
+                if r.expr(tags).contains(tag):
+                    return True
+            return False
+
         #TODO: Reimplement cycle_dirs option as cycle_tags
         self.log = WPLog(wpconf)
         self.conf = wpconf
         self.file_list = []
 
         _conn = r.connect(db='uowm')
-        cur = r.table('wallpapers').\
-              filter(r.row['tags'].contains(*tags)).run(_conn)
+        t = r.table('wallpapers')
+        f = r.row['tags']
+        if tag_match == 'OR':
+            cur = []
+            for tag in tags:
+                cur += [x for x in t.filter(f.contains(tag)).run(_conn)]
+        else: #AND
+            cur = t.filter(f.contains(*tags)).run(_conn)
+
         for wallpaper in cur:
             fullpath = wallpaper['fullpath']
             if is_image(fullpath):
@@ -53,5 +67,7 @@ def simple_draw():
     print random.choice(collection)
 if __name__ == '__main__':
     conf = WPConfiguration()
-    a = WPDBColletion(['earthporn'], conf)
+    a = WPDBColletion(['earthporn', 'comics'], conf, tag_match="OR")
+    b = WPDBColletion(['earthporn'], conf, tag_match="AND")
     print a.draw()
+    print b.draw()
